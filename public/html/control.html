@@ -1,0 +1,23 @@
+<template class="task-template">
+       <div >
+           <head>
+			<link rel="stylesheet" href="http://yui.yahooapis.com/3.0.0/build/cssreset/reset-min.css">
+			<style>
+				.fluid-input{display:inline-block;width:100%;_overflow:hidden;}
+				.fluid-input-inner{display:block;padding-left:30px;#zoom:1;}
+				.fluid-input .text, .fluid-input textarea{border:2px #ccc solid;padding:5px;width:100%;}
+				.fluid-input textarea{height:300px;}
+			</style>
+		</head>
+
+		<body>
+			<button class="btn btn-warning bitMarginBottom" ng-click="hideControl()"><i class="icon-reply"></i>返回</button>
+			<textarea id="responseText" style="width: 800px; height: 506px;">👏欢迎使用chorus wallet控制台。键入‘help’以获取命令帮助，键入‘clear’以清除屏幕。Type ‘help’ for an overview of available commands.</textarea><br/>
+			<div >
+				<b class="fluid-input"><b class="fluid-input-inner"><input class="text" type="text" ng-model='inputCmd' ng-keyup="myKeyup($event)" ></b></b>
+			</div>
+
+		</body>
+       </div>
+</template>
+

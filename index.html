@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>wallet</title>
+    <link rel="stylesheet" href="public/css/lib/bootstrap.min.css">
+    <link rel="stylesheet" href="public/css/lib/font-awesome.min.css">
+    <link rel="stylesheet" href="public/css/style.css">
+
+    <link rel="import" href="public/html/menu.html">
+    <link rel="import" href="public/html/myChorusAccount.html">
+    <link rel="import" href="public/html/myEvmAccount.html">
+    <link rel="import" href="public/html/blockInfo.html">
+    <link rel="import" href="public/html/contract.html">
+<!--     <link rel="import" href="public/html/control.html">
+    <link rel="import" href="public/html/bitcoinAccount.html"> -->
+</head>
+<body ng-app="myApp" ng-controller="myCtrl" id="angularApp">
+    <div class="popupAlert control"></div>
+    <div class="leftHideMenu navbar navbar-fixed-top" id="leftMenuDiv">
+
+    </div>
+    <div id="pageContent">
+        <button class="btn btn-default" id="menuBtn"><i class="icon-reorder open"></i> <i class="icon-remove close"></i></button>
+        <div class="subPage first  container">
+
+            <div class="row mainContent">
+                <div class="col-md-12 col-sm-12 col-xs-12 bitPadding text-center">
+                    <div class="col-md-6 col-sm-6 col-xs-6">
+                        <button class="btn btn-primary" ng-click="showNewAccount()">添加账户</button>
+                    </div>
+                    <div class="col-md-6 col-sm-6 col-xs-6">
+                        <button class="btn btn-primary" ng-click="showServerSet()">网络设置</button>
+                    </div>
+                </div>
+                <div class="col-md-12 col-sm-12 col-xs-12 bitPadding">
+                    <form class="form-horizontal formArea">
+                        <div class="input-group input-group-lg">
+                            <span class="input-group-addon">CHOP账户</span>
+                            <select  ng-model='currentAccountAddr' class="form-control" ng-options='obj.pubKey for obj in accountList' ng-change="getAccountInfo()">
+                            </select>
+                        </div>
+                        <div class="input-group input-group-lg">
+                            <span class="input-group-addon">CHOE账户</span>
+                            <select  ng-model='myEthAccountAddr' class="form-control" ng-options=' obj.address as obj.address for obj in EthaccountList'  ng-change='getEthAccountInfo()'>
+                        </select>
+                        </div>
+                        <div class="input-group input-group-lg">
+                            <span class="input-group-addon">合约</span>
+                            <select  ng-model='myContract' class="form-control" ng-options='obj.name for obj in contractList' ng-change="selectMyCotract()" >
+                            </select>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+            <div class="popup ServerSet">
+                <button class="btn btn-warning bitMarginBottom" ng-click="hidePop()"><i class="icon-reply"></i>返回</button>
+                <div class="clearfix"></div>
+                <div class="content">
+                    <div class="input-group input-group-lg">
+                        <span class="input-group-addon">节点地址</span>
+                        <input type="text" class="form-control" ng-model="newIp.server" placeholder="请输入网络节点地址，包括端口号,例如:http://localhost:46657">
+                        <select  ng-model='newIp' class="form-control" ng-options='obj.name for obj in ipList'></select>
+                    </div>
+                    <div class="text-center marginTop20">
+                        <button class="btn btn-primary" ng-click="setIp()">设置IP</button>
+                    </div>
+                </div>
+            </div>
+            <div class="popup newAccount">
+                <button class="btn btn-warning bitMarginBottom" ng-click="hidePop()"><i class="icon-reply"></i>返回</button>
+                <div class="clearfix"></div>
+                <div class="col-md-12 col-sm-12 col-xs-12 bitPadding text-center">
+                    <div class="col-md-6 col-sm-6 col-xs-6">
+                        <button class="btn btn-primary" ng-click="toggleAccount(1)"><i></i>创建账户</button>
+                    </div>
+                    <div class="col-md-6 col-sm-6 col-xs-6">
+                        <button class="btn btn-primary" ng-click="toggleAccount(2)"><i></i>恢复账户</button>
+                    </div>
+                </div>
+                <div class="col-md-12 col-sm-12 col-xs-12 bitPadding divBorder">
+                    <div class="input-group" ng-show="showGenAccount">
+                        <input type="password" class="form-control" placeholder="please set your account password" ng-model='accountPwd'>
+                        <span class="input-group-btn">
+                            <button class="btn btn-primary" type="button" ng-click="createAccount()">生成CHOP账户对</button>
+                        </span>
+                        <input type="password" class="form-control" placeholder="please set your account password" ng-model='ethAccountPwd'>
+                        <span class="input-group-btn">
+                            <button class="btn btn-primary" type="button" ng-click="createEthAccount()">生成CHOE账户</button>
+                        </span>
+                    </div>
+                    <div class="input-group" ng-show="showBackupAccount">
+                        <div class="bitPadding">
+                            <input type="radio" name="typeChoice" ng-value="0" ng-model="typeChoice" >恢复CHOE账户<br>
+                            <p>使用Recover Phrase恢复CHOE账户</p>
+                        </div>
+                        <div class="bitPadding">
+                            <input type="radio" name="typeChoice" ng-value="1" ng-model="typeChoice" >恢复CHOE账户<br>
+                            <p>使用CHOE账户私钥账户</p>
+                        </div>
+                        <div class="bitPadding">
+                            <input type="radio" name="typeChoice" ng-value="2" ng-model="typeChoice" >恢复CHOP账户<br>
+                            <p>使用CHOP账户私钥账户</p>
+                        </div> 
+                        <div class="row">
+                            <div class='col-md-6 col-sm-6 col-xs-6 text-center'>
+                                <button class='btn btn-info' ng-click="backUpNextStep()">下一步</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="input-group" ng-show="showCHOE_backup_1">                        
+                        <input type="text" class="form-control" placeholder="please entry Recover Phrase" ng-model='recoverPhrase'>
+                        <input type="password" class="form-control" placeholder="please set password for your recovery account" ng-model='accountPasswd'>
+                        <span class="input-group-btn">
+                            <button class="btn btn-primary" type="button" ng-click="recoverAccount_CHOE_RP()">恢复CHOE账户</button>
+                        </span>
+                    </div>
+                    <div class="input-group" ng-show="showCHOE_backup_2">                        
+                        <input type="text" class="form-control" placeholder="please entry CHOE privateKey" ng-model='eth_privateKey'>
+                        <input type="password" class="form-control" placeholder="please set password for your recovery account" ng-model='accountPasswd'>
+                        <span class="input-group-btn">
+                            <button class="btn btn-primary" type="button" ng-click="recoverAccount_CHOE_PK()">恢复CHOE账户</button>
+                        </span>
+                    </div>
+                    <div class="input-group" ng-show="showCHOP_backup">                        
+                        <input type="text" class="form-control" placeholder="please entry CHOP privateKey" ng-model='chorus_privateKey'>
+                        <input type="password" class="form-control" placeholder="please set password for your recovery account" ng-model='accountPasswd'>
+                        <span class="input-group-btn">
+                            <button class="btn btn-primary" type="button" ng-click="recoverAccount_CHOP_PK()">恢复CHOP账户</button>
+                        </span>
+                    </div>
+                    <div ng-show='newAccountArea' id='newAccountArea'>
+                        <div class="panel panel-primary marginTop20">
+                            <div class="panel-heading">
+                                CHOP账户地址
+                            </div>
+                            <div class="panel-body" >
+                                <pre> <code ng-bind="newAccountObj.pubKey"> </code>  </pre>
+                            </div>
+                        </div>
+
+                        <div class="panel panel-primary">
+                            <div class="panel-heading">
+                                关联CHOE账户地址
+                            </div>
+                            <div class="panel-body"  >
+                                <pre> <code ng-bind="newAccountObj.relatedAddress"> </code>  </pre>
+                            </div>
+                        </div>
+
+                        <div class="panel panel-primary">
+                                <div class="panel-heading">
+                                    关联CHOE账户 Recover Phrase
+                                </div>
+                                <div class="panel-body"  >
+                                    <pre> <code ng-bind="newAccountObj.recoverPhrase"> </code>  </pre>
+                                </div>
+                            </div>
+
+                        <div class="panel panel-primary">
+                            <div class="panel-heading">
+                                CHOP账户私钥(AES加密)
+                            </div>
+                            <div class="panel-body"  >
+                                <pre> <code ng-bind="newAccountObj.chop_private"> </code>  </pre>
+                            </div>
+                        </div>
+
+                        <div class="panel panel-primary">
+                                <div class="panel-heading">
+                                    CHOE账户私钥(AES加密)
+                                </div>
+                                <div class="panel-body"  >
+                                    <pre> <code ng-bind="newAccountObj.choe_private"> </code>  </pre>
+                                </div>
+                            </div>
+                    </div>
+                    <div ng-show='newEthAccountArea' id='newEthAccountArea'>
+                        <div class="panel panel-primary marginTop20">
+                            <div class="panel-heading">
+                                CHOE账户地址
+                            </div>
+                            <div class="panel-body" >
+                                <pre> <code ng-bind="newAccountObj.address"> </code>  </pre>
+                            </div>
+                        </div>
+
+                        <div class="panel panel-primary">
+                            <div class="panel-heading">
+                                CHOE账户私钥(AES加密)
+                            </div>
+                            <div class="panel-body"  >
+                                <pre> <code ng-bind="newAccountObj.private"> </code>  </pre>
+                            </div>
+                        </div>
+                        <div class="panel panel-primary">
+                            <div class="panel-heading">
+                                Recover Phrase
+                            </div>
+                            <div class="panel-body"  >
+                                <pre> <code ng-bind="newAccountObj.recoverPhrase"> </code>  </pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div ng-show='recoverAccountArea' id='recoverAccountArea'>
+                        <div class="panel panel-primary marginTop20">
+                            <div class="panel-heading">
+                                账户地址
+                            </div>
+                            <div class="panel-body" >
+                                <pre> <code ng-bind="recoverAccountObj.address"> </code>  </pre>
+                            </div>
+                        </div>
+
+                        <div class="panel panel-primary">
+                            <div class="panel-heading">
+                                账户私钥(AES加密)
+                            </div>
+                            <div class="panel-body"  >
+                                <pre> <code ng-bind="recoverAccountObj.private"> </code>  </pre>
+                            </div>
+                        </div>
+                    </div>
+                
+                </div>
+            </div>
+        </div>
+
+        <div class="subPage container">
+            <div class="row">
+                <div class="col-md-12 col-sm-12 col-xs-12 myChorusAccountSubPage">
+                    
+                </div>
+            </div>
+        </div>
+
+        <div class="subPage container">
+            <div class="row">
+                <div class="col-md-12 col-sm-12 col-xs-12 myEvmAccountSubPage">
+                    
+                </div>
+            </div>
+        </div>
+
+        <div class="subPage container">
+            <div class="row">
+                <div class="col-md-12 col-sm-12 col-xs-12 blockInfoSubPage">
+                    
+                </div>
+            </div>
+        </div>
+
+        <div class="subPage container">
+            <div class="row">
+                <div class="col-md-12 col-sm-12 col-xs-12 contractSubPage">
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="contractComplieShow" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel" >合约部署初始化参数</h4>
+                </div>
+                <div class="modal-body">
+                    <div class='panel panel-default'>
+                        <div class='panel-heading'>
+                            参数设置
+                        </div>
+                        <div class='panel-body'>
+                            <form>
+                                <div class="form-group" >
+                                    <label ng-bind="argname"></label>
+                                    <input type="text" class="form-control" placeholder="{{insertarg}}" ng-model="inputDepArg">
+                                </div>
+                            </form>
+                            <button class='btn btn-primary' ng-click='initDeploy()'>下一步</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="contractShow" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel" >合约解析结果</h4>
+                </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" ng-click="saveContract()">保存合约</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal -->
+    </div>
+    <script>
+        window.$ = window.jQuery = require('./public/js/lib/jquery-2.1.4.min.js')
+        require('./public/js/lib/angular.min.js');
+        require('./public/js/lib/bootstrap.min.js');
+        require('./public/js/menu.js');
+        require('./public/js/common.js');
+        require('./public/js/lib/aes.js');
+        require('./public/js/app.js');
+        
+    </script>
+</body>
+</html>

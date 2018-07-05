@@ -1,0 +1,141 @@
+<template class="task-template">
+	<div class="myAccountArea" ng-show="showEthAccountArea">
+		<h4 class='text-center bitMarginBottom'>我的CHOE账户</h4>
+		<div class='panel panel-primary'>
+			<div class="panel-heading">
+	            <form class="form-horizontal formArea ">
+	                <div class="input-group input-group-lg noPadding">
+	                    <span class="input-group-addon">账户</span>
+	                    <select  ng-model='myEthAccountAddr' class="form-control" ng-options=' obj.address as obj.address for obj in EthaccountList'  ng-change='getEthAccountInfo()'>
+	                    </select>
+	                </div>
+	            </form>
+	        </div>
+            <div class='text-right bitPadding' ng-show="myEthAccountInfo">
+                <button class='btn btn-primary' ng-click="showBackup(2)"><i></i>备份账户</button>
+                <button class='btn btn-danger' ng-click="deleteEthAccount()"><span class='icon-trash'></span>删除CHOE账户</button>
+            </div>
+	        <div class="panel-body" ng-show="myEthAccountInfo">
+	            <table class='table table-bordered text-center'>
+					<tr>
+						<td>账户地址</td><td ng-bind='myEthAccountInfo.address'></td>
+					</tr>
+					<tr>
+						<td>加密私钥地址</td><td ng-bind='myEthAccountInfo.private'></td>
+					</tr>
+					<tr>
+						<td>账户余额</td><td ng-bind='myEthAccountInfo.balance'></td>
+					</tr>
+				</table>
+				<div class="row bitPadding">
+					<div class='text-center'>
+						<button class='btn btn-info' ng-click="showEthTransfer()">转账</button>
+					</div>
+				</div>
+	        </div>
+		</div>
+    </div>
+
+
+	<div class="transfer" ng-show="showEthTransferFlag">
+	    <button class="btn btn-warning bitMarginBottom" ng-click="hideEthTransfer()"><i class="icon-reply"></i>返回</button>
+	    <div class="clearfix"></div>
+            <div class='panel panel-default'>
+                <div class='panel-heading'>
+                    我的账户
+                </div>
+                <div class='panel-body inputBody padding10' >
+                	<p class="label label-info" ng-bind="ethtransferObj.from"></span>
+                </div>
+            </div>
+            <div class='panel panel-default'>
+                <div class='panel-heading'>
+                    账户密码
+                </div>
+                <div class='panel-body inputBody'>
+                    <input type='password' ng-model='ethtransferObj.password' class='form-control' placeholder='请输入账户密码'>
+                </div>
+            </div>
+            <div class='panel panel-default'>
+                <div class='panel-heading'>
+                    转账地址
+                </div>
+                <div class='panel-body inputBody'>
+                    <input type='text' ng-model='ethtransferObj.to' class='form-control' placeholder='请输入转账地址'>
+                </div>
+            </div>
+            <div class='panel panel-default'>
+                <div class='panel-heading'>
+                    转账金额
+                </div>
+                <div class='panel-body inputBody'>
+                    <input type='text' ng-model='ethtransferObj.amount' class='form-control' placeholder='请输入转账金额' oninput="document.getElementById('ETHvalue').innerHTML=this.value;" onpropertychange="document.getElementById('ETHvalue').innerHTML=this.value;">
+                </div>
+            </div>
+            <div class='panel-body inputBody' ng-show="showTranferSetting">
+                <div class='panel panel-default'>
+                    <div class='panel-heading'>
+                        gas
+                    </div>
+                    <div class='panel-body inputBody'>
+                        <input type='text' ng-model='ethtransferObj.gas' class='form-control' placeholder='请输入您期望的gas(默认值：212100)' oninput="document.getElementById('gas').innerHTML=this.value;" onpropertychange="document.getElementById('gas').innerHTML=this.value;">
+                    </div>
+                </div>
+                <div class='panel panel-default'>
+                    <div class='panel-heading'>
+                        gasPrice
+                    </div>
+                    <div class='panel-body inputBody'>
+                        <input type='text' ng-model='ethtransferObj.gasPrice' ng-click="showInputGasPrice(1)" class='form-control' placeholder='请输入您期望的gasPrice(默认值：1)' oninput="document.getElementById('gasPrice').innerHTML=this.value;" onpropertychange="document.getElementById('gasPrice').innerHTML=this.value;">
+                    </div>
+                </div>
+                <div class='panel panel-default'>
+                    <div class='panel-heading'>
+                        data
+                    </div>
+                    <div class='panel-body inputBody'>
+                        <input type='text' ng-model='ethtransferObj.data' class='form-control' placeholder='请输入您期望的data'>
+                    </div>
+                </div> 
+            </div>
+            <div class='panel panel-default'>
+                <div class='panel-heading'>
+                    转账金额：<span id="ETHvalue">0</span>CHOE 
+                </div>
+            </div>
+            <div class='panel panel-default' ng-show="showGasPrice">
+                <div class='panel-heading'>
+                    total transaction amount：<span id="gasPrice">未输入值</span>wei
+                </div>
+            </div>
+            <div class='panel panel-default' ng-show="showTotal">
+                <div class='panel-heading'>
+                    总计：<p class="label label-info" ng-bind="transferObj.total"></span>
+                </div>
+            </div>
+            <div class='col-md-6 col-sm-6 col-xs-6 text-center'>
+                <button class='btn btn-primary' ng-click="ethTransfer()" >转账</button>
+            </div>
+            <div class='col-md-6 col-sm-6 col-xs-6 text-center'>
+                <button class='btn btn-primary' ng-click="setting()" >高级</button>
+            </div>
+        </div>  	
+    </div>
+    <div class="backup" ng-show="showEthAccountBackupArea">
+        <button class="btn btn-warning bitMarginBottom" ng-click="hideEthAccountBackupArea()"><i class="icon-reply"></i>返回</button>
+        <div class="clearfix"></div>
+        <h4 class='text-center bitMarginBottom'>CHOE账户备份</h4>
+        <div class="content">
+            <div class='panel-body inputBody padding10' >
+                <p class="label label-info" ng-bind="myEthAccountInfo.address"></span>
+            </div>
+            <div class="input-group input-group-lg">
+                <span class="input-group-addon">账户密码</span>
+                <input type="password" class="form-control" ng-model="backUp.password" placeholder="请输入账户密码.">
+            </div>
+            <div class="text-center marginTop20">
+                <button class="btn btn-primary" ng-click="backUp(1)">备份</button>
+            </div>
+        </div>
+    </div>		
+</template>

@@ -1,0 +1,282 @@
+<template class="task-template">
+	<div class="contractArea" ng-show="showContractArea">
+		<h4 class='text-center bitMarginBottom'>合约</h4>
+		<div class="row">
+			<div class='col-md-4 col-sm-4 col-xs-4 text-center bitPadding'>
+				<button class='btn btn-info' ng-click="showWatch()">观察合约</button>
+			</div>
+	        	<div class='col-md-4 col-sm-4 col-xs-4 text-center'>
+	            	<button class='btn btn-info' ng-click="showDeploy()">部署合约</button>
+	        	</div>
+	       		<div class='col-md-4 col-sm-4 col-xs-4 text-center'>
+	            	<button class='btn btn-info' ng-click="showDevelop()">开发合约</button>
+	        	</div>
+		</div>
+
+		<div class='panel panel-primary'>
+			<div class="panel-heading">
+	            <form class="form-horizontal formArea ">
+	                <div class="input-group input-group-lg noPadding">
+	                   <span class="input-group-addon">合约</span>
+	                   <select  ng-model='myContract' class="form-control" ng-options='obj.name for obj in contractList' ng-change="selectMyCotract()" ></select>
+	                </div>
+	            </form>
+	        </div>
+	        <div class="panel-body" ng-show="myContract">
+	        	<div class='text-right bitPadding'>
+					<button class='btn btn-primary' ng-click="showABI()"><i></i>查看合约ABI</button>
+					<button class='btn btn-danger' ng-click="deleteContract()"><span class='icon-trash'></span>删除</button>
+				</div>
+	        	<table class='table table-bordered text-center '>
+					<tr>
+						<td>合约名称</td><td ng-bind='myContract.name'></td>
+					</tr>
+					<tr>
+						<td>合约地址</td><td ng-bind='myContract.address'></td>
+					</tr>
+				</table>
+				<div class="selectmode" ng-show="myContract">
+                    <div class="col-md-12 col-sm-12 col-xs-12 bitPadding text-center">
+                        <div class="col-md-6 col-sm-6 col-xs-6">
+                            <button class="btn btn-primary" ng-click="showfunAreaQuery()"><i></i>查询</button>
+                        </div>
+                        <div class="col-md-6 col-sm-6 col-xs-6">
+                            <button class="btn btn-primary" ng-click="showfunAreaTrade()"><i></i>执行</button>
+                        </div>
+                    </div>
+                </div>
+				<div class='myFunArea' ng-show="funAreaQuery">
+                    <div class='panel panel-default'>
+                        <div class='panel-heading'>
+                            合约函数(get)
+                        </div>
+                        <div class='panel-body'>
+                             <select  ng-model='getFunObj' class="form-control" ng-options='obj.name for obj in getFunList' ng-change="selectGetfun()">
+                            </select>
+                        </div>
+                    </div>
+                    <div class='panel panel-default' >
+                        <div class='panel-heading' ng-show='funcInputs.length > 0'>
+                            函数参数
+                        </div>
+                        <div class='panel-body ' ng-show='funcInputs.length > 0'>
+                            <form class="padding10"> 
+                                <div class="form-group" ng-repeat="item in funcInputs">
+                                    <label for="name">{{item.name}}</label>
+                                    <input type="text" ng-model="$parent.getParams[$index]" class="form-control" placeholder="{{item.type}}">
+                               </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class='panel panel-default' ng-show='queryResultArea'>
+                        <div class='panel-heading'>
+                            查询结果
+                        </div>
+                        <div class='panel-body'>
+                             <p ng-bind="queryResult" class="padding10"></p>
+                        </div>
+                    </div>
+                    <div class='panel panel-default'>
+                        <div class='panel-heading'>
+                            CHOE执行账户
+                        </div>
+                        <div class='panel-body'>
+                             <select  ng-model='myEthAccountAddr' class="form-control" ng-options=' obj.address as obj.address for obj in EthaccountList'  ng-change='getEthAccountInfo()'>
+	                    	</select>
+                        </div>
+                    </div>
+                    <div class="text-right bitPadding">
+                    	<button class='btn btn-primary' ng-click='queryContract()'>查询</button>
+                    </div>
+                    
+                </div>
+                <div class='muFunArea01' ng-show="funAreaTrade">
+                    <div class='panel panel-default'>
+                        <div class='panel-heading'>
+                            合约函数(sent)
+                        </div>
+                        <div class='panel-body'>
+                             <select  ng-model='sentFunObj' class="form-control" ng-options='obj.name for obj in sentFunList' ng-change="selectSentfun()">
+
+                            </select>
+                        </div>
+                    </div>
+                    <div class='panel panel-default' >
+                        <div class='panel-heading' ng-show='funcInputs.length > 0'>
+                            函数参数
+                        </div>
+                        <div class='panel-body ' ng-show='funcInputs.length > 0'>
+                            <form class="padding10"> 
+                                <div class="form-group" ng-repeat="item in funcInputs">
+                                    <label for="name">{{item.name}}</label>
+                                    <input type="text" ng-model="$parent.sentParams[$index]" class="form-control" placeholder="{{item.type}}">
+                               </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class='panel panel-default'>
+                        <div class='panel-heading'>
+                            CHOE执行账户
+                        </div>
+                        <div class='panel-body'>
+                             <select  ng-model='myEthAccountAddr' class="form-control" ng-options=' obj.address as obj.address for obj in EthaccountList'  ng-change='getEthAccountInfo()'>
+	                    	</select>
+                        </div>
+                    </div>
+                    <div class='panel panel-default'>
+                        <div class='panel-heading'>
+                            密码
+                        </div>
+                        <div class='panel-body inputBody'>
+                            <input type='password' ng-model='inputPwd' class='form-control' placeholder='请输账户密码'>
+                        </div>
+                    </div>
+                    <div class="text-right bitPadding">
+                    	<button class='btn btn-primary' ng-click='execContract()'>提交交易</button>
+                    </div>
+                </div>
+	        </div>
+		</div>
+	</div>
+	<div class="watchArea" ng-show="showWatchArea">
+		<button class="btn btn-warning bitMarginBottom" ng-click="hideWatch()"><i class="icon-reply"></i>返回</button>
+		<h4 class='text-center bitMarginBottom'>请选择合约类型</h4>
+		<div class="bitPadding">
+			<input type="radio" name="typeChoice" ng-value="0" ng-model="typeChoice" >Token Contract<br>
+			<p>标准ERC20代币合约</p>
+		</div>
+		<div class="bitPadding">
+			<input type="radio" name="typeChoice" ng-value="1" ng-model="typeChoice" >Multisig Wallet<br>
+        	<p>以太坊多重签名钱包合约</p>
+		</div>
+		<div class="bitPadding">
+			<input type="radio" name="typeChoice" ng-value="2" ng-model="typeChoice" >Custom Contract<br>
+        	<p>通过ABI创建合约</p>
+		</div> 
+		<div class="row">
+            <div class='col-md-6 col-sm-6 col-xs-6 text-center bitPadding'>
+                <button class='btn btn-info' ng-click="hideWatch()">取消</button>
+            </div>
+            <div class='col-md-6 col-sm-6 col-xs-6 text-center'>
+                <button class='btn btn-info' ng-click="showEnterContractDetails()">下一步</button>
+            </div>
+        </div>
+	</div>
+	<div class="EnterContractDetailsArea" ng-show="showEnterContractDetailsArea">
+		<button class="btn btn-warning bitMarginBottom" ng-click="backToTypeChoice()"><i class="icon-reply"></i>返回</button>
+		<h4 class='text-center bitMarginBottom'>输入合约信息</h4>
+		<form class='ABIForm' name="ABIForm"  novalidate>
+            <div class='panel panel-default'>
+                <div class='panel-heading'>
+                    合约名称(name)
+                </div>
+                <div class='panel-body inputBody'>
+                    <input type='text' ng-model='newContract.name' class='form-control' placeholder='请输入合约名称'>
+                </div>
+            </div>
+            <div class='panel panel-default'>
+                <div class='panel-heading'>
+                    合约地址(address)
+                </div>
+                <div class='panel-body inputBody'>
+                    <input type='text' ng-model='newContract.address' class='form-control' placeholder='请输入合约地址'>
+                </div>
+            </div>
+            <div class='panel panel-default'>
+                <div class='panel-heading'>
+                    合约ABI(JSON INTERFACE)
+                </div>
+                <div class='panel-body inputBody'>
+                    <textarea class='form-control' rows='8' ng-model='newContract.ABI'>
+
+                    </textarea>
+                </div>
+            </div>
+            <div class='col-md-6 col-sm-6 col-xs-6 text-center'>
+                <button class='btn btn-info' ng-click="hideWatch()">取消</button>
+            </div>
+            <div class='col-md-6 col-sm-6 col-xs-6 text-center'>
+                <button class='btn btn-info' ng-click="analysisContract()" >解析合约</button>
+            </div>
+        </form>
+	</div>
+	<div class="deployArea" ng-show="showDeployArea">
+		<button class="btn btn-warning bitMarginBottom" ng-click="hideDeploy()"><i class="icon-reply"></i>返回</button>
+		<h4 class='text-center bitMarginBottom'>合约信息</h4>
+		<div class='panel panel-default'>
+            <div class='panel-heading'>
+                合约名称(name)
+            </div>
+            <div class='panel-body inputBody'>
+                <input type='text' ng-model='depContract.name' class='form-control' placeholder='请输入合约名称'>
+            </div>
+        </div>
+        <div class='panel panel-default'>
+            <div class='panel-heading'>
+                合约ABI(JSON INTERFACE)
+            </div>
+            <div class='panel-body inputBody'>
+                <input type='text' ng-model='depContract.ABI' class='form-control' placeholder='请输入合约ABI'>
+            </div>
+        </div>
+        <div class='panel panel-default'>
+            <div class='panel-heading'>
+                合约CODE
+            </div>
+            <div class='panel-body inputBody'>
+                <input type='text' ng-model='depContract.code' class='form-control' placeholder='请输入合约CODE'>
+            </div>
+        </div>
+        <h4 class='text-center bitMarginBottom'>执行账户</h4>
+        <div class='panel panel-default'>
+            <div class='panel-heading'>
+                CHOE执行账户
+            </div>
+            <div class='panel-body inputBody'>
+                <select  ng-model='myEthAccountAddr' class="form-control" ng-options=' obj.address as obj.address for obj in EthaccountList'  ng-change='getEthAccountInfo()'>
+	            </select>
+            </div>
+        </div>
+        <div class='panel panel-default'>
+            <div class='panel-heading'>
+                密码
+            </div>
+            <div class='panel-body inputBody'>
+                <input type='password' ng-model='depContract.password' class='form-control' placeholder='请输入账户密码'>
+	            </select>
+            </div>
+        </div>
+        <h4 class='text-center bitMarginBottom'>交易参数</h4>
+        <div class='panel panel-default'>
+            <div class='panel-heading'>
+                gas
+            </div>
+            <div class='panel-body inputBody'>
+                <input type='text' ng-model='depContract.gas' class='form-control' placeholder='请输入合约gas(默认值：212100)'>
+            </div>
+        </div>
+        <div class='panel panel-default'>
+            <div class='panel-heading'>
+                gasPrice
+            </div>
+            <div class='panel-body inputBody'>
+                <input type='text' ng-model='depContract.gasPrice' class='form-control' placeholder='请输入合约gasPrice(默认值：1)'>
+	            </select>
+            </div>
+        </div>
+        <div class='col-md-6 col-sm-6 col-xs-6 text-center'>
+            <button class='btn btn-info' ng-click="hideDeploy()">取消</button>
+        </div>
+        <div class='col-md-6 col-sm-6 col-xs-6 text-center'>
+            <button class='btn btn-info' ng-click="deployContract()" >部署合约</button>
+        </div>
+	</div>
+	<div class="ABIArea" ng-show="showABIArea">
+		<button class="btn btn-warning bitMarginBottom" ng-click="hideABI()"><i class="icon-reply"></i>返回</button>
+		<table class='table table-bordered text-center'>
+			<tr>
+				<td>合约ABI</td><td ng-bind='myContract.abi'></td>
+			</tr>
+		</table>
+	</div>	
+</template>

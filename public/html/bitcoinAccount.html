@@ -1,0 +1,143 @@
+<template class="task-template">
+    <div class="col-md-12 col-sm-12 col-xs-12 bitPadding text-center">
+        <div class="col-md-6 col-sm-6 col-xs-6">
+            <button class="btn btn-primary" ng-click="showNewAccount()"><i class="icon-plus"></i>添加账户</button>
+        </div>
+    </div>
+	<div class="myAccountArea" ng-show="!showTransferFlag">
+		<h4 class='text-center bitMarginBottom'>我的账户</h4>
+
+		<div class='panel panel-primary'>
+			<div class="panel-heading">
+	            <form class="form-horizontal formArea ">
+	                <div class="input-group input-group-lg noPadding">
+	                    <span class="input-group-addon">账户</span>
+	                    <select  ng-model='myAccountAddr' class="form-control" ng-options=' obj.address as obj.address for obj in accountList'  ng-change='getAccountInfo()'>
+	                    </select>
+	                </div>
+	            </form>
+	        </div>
+	        <div class="panel-body" ng-show="myAccountInfo">
+	            <table class='table table-bordered text-center'>
+					<tr>
+						<td>账户地址</td><td ng-bind='myAccountInfo.address'></td>
+					</tr>
+					<tr>
+						<td>加密私钥地址</td><td ng-bind='myAccountInfo.private'></td>
+					</tr>
+					<tr>
+						<td>用户密码</td><td ng-bind='myAccountInfo.passphrase'></td>
+					</tr>
+					<tr>
+						<td>账户余额</td><td ng-bind='myAccountInfo.balance+"Ether"'></td>
+					</tr>
+				</table>
+				<div class="row">
+					<div class='col-md-6 col-sm-6 col-xs-6 text-center'>
+						<button class='btn btn-info' ng-click="showTransfer()">转账</button>
+					</div>
+					<div class='col-md-6 col-sm-6 col-xs-6 text-center'>
+						<button class='btn btn-danger' ng-click="deleteAccount()"><span class='icon-trash'></span></button>
+					</div>
+				</div>
+	        </div>
+		</div>
+	</div>
+	<div class="transfer" ng-show="showTransferFlag">
+	    <button class="btn btn-warning bitMarginBottom" ng-click="hideTransfer()"><i class="icon-reply"></i>返回</button>
+	    <div class="clearfix"></div>
+	    <form class='ABIForm' name="ABIForm"  novalidate>
+            <div class='panel panel-default'>
+                <div class='panel-heading'>
+                    我的账户
+                </div>
+                <div class='panel-body inputBody padding10' >
+                	<p class="label label-info" ng-bind="transferObj.from"></span>
+                    <!-- <input type='text' ng-model='transferObj.from' class='form-control' placeholder=''> -->
+                </div>
+            </div>
+            <div class='panel panel-default'>
+                <div class='panel-heading'>
+                    账户密码
+                </div>
+                <div class='panel-body inputBody'>
+                    <input type='text' ng-model='transferObj.password' class='form-control' placeholder='请输入账户密码'>
+                </div>
+            </div>
+            <div class='panel panel-default'>
+                <div class='panel-heading'>
+                    转账地址
+                </div>
+                <div class='panel-body inputBody'>
+                    <input type='text' ng-model='transferObj.to' class='form-control' placeholder='请输入转账地址'>
+                </div>
+            </div>
+            <div class='panel panel-default'>
+                <div class='panel-heading'>
+                    转账金额
+                </div>
+                <div class='panel-body inputBody'>
+                    <input type='text' ng-model='transferObj.amount' class='form-control' placeholder='请输入转账金额' oninput="document.getElementById('value').innerHTML=this.value;" onpropertychange="document.getElementById('value').innerHTML=this.value;">
+                </div>
+            </div>
+            <div class='panel-body inputBody' ng-show="showTranferSetting">
+            	<div class='panel panel-default'>
+            		<div class='panel-heading'>
+            			gas
+            		</div>
+            		<div class='panel-body inputBody'>
+                    	<input type='text' ng-model='transferObj.gas' class='form-control' placeholder='请输入您期望的gas' oninput="document.getElementById('gas').innerHTML=this.value;" onpropertychange="document.getElementById('gas').innerHTML=this.value;">
+                	</div>
+                </div>
+                <div class='panel panel-default'>
+                	<div class='panel-heading'>
+            			gasPrice
+            		</div>
+            		<div class='panel-body inputBody'>
+                   	 <input type='text' ng-model='transferObj.gasPrice' ng-click="showInputGasPrice(1)" class='form-control' placeholder='请输入您期望的gasPrice' oninput="document.getElementById('gasPrice').innerHTML=this.value;" onpropertychange="document.getElementById('gasPrice').innerHTML=this.value;">
+                	</div>
+                </div>
+                <div class='panel panel-default'>
+            		<div class='panel-heading'>
+            			data
+            		</div>
+            		<div class='panel-body inputBody'>
+                    	<input type='text' ng-model='transferObj.data' class='form-control' placeholder='请输入您期望的data'>
+                	</div>
+                </div>
+                <div class='col-md-6 col-sm-6 col-xs-6 text-center'>
+                <button class='btn btn-primary' ng-click="calculate()" >确认</button>
+            </div>
+            <br />	
+            </div>
+            <div class='panel panel-default'>
+                <div class='panel-heading'>
+                    转账金额：<span id="value">0</span>ETH
+                </div>
+            </div>
+			<div class='panel panel-default'>
+                <div class='panel-heading'>
+                    gas：<span id="gas">4712388</span>
+                </div>
+            </div>
+            <div class='panel panel-default' ng-show="showGasPrice">
+                <div class='panel-heading'>
+                    gasPrice：<span id="gasPrice">未输入值</span>wei
+                </div>
+            </div>
+            <div class='panel panel-default' ng-show="showTotal">
+                <div class='panel-heading'>
+                    总计：<p class="label label-info" ng-bind="transferObj.total"></span>
+                </div>
+            </div>
+            <div class='col-md-6 col-sm-6 col-xs-6 text-center'>
+                <button class='btn btn-primary' ng-click="transfer()" >转账</button>
+            </div>
+            <div class='col-md-6 col-sm-6 col-xs-6 text-center'>
+            	<button class='btn btn-primary' ng-click="setting()" >高级</button>
+            </div>
+        </form>
+	  	
+	</div>
+		
+</template>

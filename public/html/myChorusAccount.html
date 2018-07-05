@@ -1,0 +1,346 @@
+<template class="task-template">
+	<div class="myAccountArea" ng-show="showAccountArea">
+		<h4 class='text-center bitMarginBottom'>我的CHOP账户</h4>
+		<div class='panel panel-primary'>
+			<div class="panel-heading">
+	            <form class="form-horizontal formArea ">
+	                <div class="input-group input-group-lg noPadding">
+	                    <span class="input-group-addon">账户</span>
+	                    <select  ng-model='myAccountAddr' class="form-control" ng-options=' obj.pubKey as obj.pubKey for obj in accountList'  ng-change='getAccountInfo()'>
+	                    </select>
+	                </div>
+	            </form>
+	        </div>
+            <div class='text-right bitPadding' ng-show="myAccountInfo">
+                <button class='btn btn-primary' ng-click="showBackup(1)"><i></i>备份账户</button>                
+                <button class='btn btn-danger' ng-click="deleteAccount()"><span class='icon-trash'></span>删除CHOP账户</button>
+            </div>
+	        <div class="panel-body" ng-show="myAccountInfo">
+	            <table class='table table-bordered text-center'>
+					<tr>
+						<td>账户地址</td><td ng-bind='myAccountInfo.pubKey'></td>
+					</tr>
+					<tr>
+						<td>加密私钥地址(AES)</td><td ng-bind='myAccountInfo.privKey'></td>
+					</tr>
+					<tr>
+						<td>关联CHOE账户地址</td><td ng-bind='myAccountInfo.ethAddress'></td>
+					</tr>
+					<tr>
+						<td>账户余额</td><td ng-bind='myAccountInfo.balance'></td>
+					</tr>
+                    <tr>
+                        <td>抵押余额</td><td ng-bind='myAccountInfo.power'></td>
+                    </tr>
+				</table>
+				<div class="row bitPadding">
+					<div class='col-md-4 col-sm-4 col-xs-4 text-center'>
+						<button class='btn btn-info' ng-click="showTransfer()">转账</button>
+					</div>
+                    <div class='col-md-4 col-sm-4 col-xs-4 text-center'>
+                        <button class='btn btn-info' ng-click="showMortgage()">抵押</button>
+                    </div>
+                    <div class='col-md-4 col-sm-4 col-xs-4 text-center'>
+                        <button class='btn btn-info' ng-click="showRedemption()">解押</button>
+                    </div>
+				</div>
+	        </div>
+		</div>
+	</div>
+	<div class="transfer" ng-show="showTransferFlag">
+	    <button class="btn btn-warning bitMarginBottom" ng-click="hideTransfer()"><i class="icon-reply"></i>返回</button>
+	    <div class="clearfix"></div>
+	    <form class='ABIForm' name="ABIForm"  novalidate>
+            <div class='panel panel-default'>
+                <div class='panel-heading'>
+                    我的CHOP账户
+                </div>
+                <div class='panel-body inputBody padding10' >
+                	<p class="label label-info" ng-bind="transferObj.from"></span>
+                </div>
+            </div>
+            <div class='panel panel-default'>
+                <div class='panel-heading'>
+                    我的CHOE账户
+                </div>
+                <div class='panel-body inputBody padding10' >
+                    <select  ng-model='myEthAccountAddr' class="form-control" ng-options=' obj.address as obj.address for obj in EthaccountList' ng-change='getEthAccountInfo()'>
+                    </select>
+                </div>
+            </div>
+            <div class='panel panel-default' ng-show='!isAccountPair'>
+                <div class='panel-heading'>
+                    CHOP账户密码
+                </div>
+                <div class='panel-body inputBody'>
+                    <input type='password' ng-model='transferObj.password' class='form-control' placeholder='请输入账户密码'>
+                </div>
+            </div>
+            <div class='panel panel-default' ng-show='!isAccountPair'>
+                <div class='panel-heading'>
+                    CHOE账户密码
+                </div>
+                <div class='panel-body inputBody'>
+                    <input type='password' ng-model='transferObj.ethpassword' class='form-control' placeholder='请输入账户密码'>
+                </div>
+            </div>
+            <div class='panel panel-default' ng-show='isAccountPair'>
+                <div class='panel-heading'>
+                    CHOP账户对密码
+                </div>
+                <div class='panel-body inputBody'>
+                    <input type='password' ng-model='transferObj.password' class='form-control' placeholder='请输入账户密码'>
+                </div>
+            </div>
+            <div class='panel panel-default'>
+                <div class='panel-heading'>
+                    CHOP转账地址
+                </div>
+                <div class='panel-body inputBody'>
+                    <input type='text' ng-model='transferObj.to' class='form-control' placeholder='请输入转账地址'>
+                </div>
+            </div>
+            <div class='panel panel-default'>
+                <div class='panel-heading'>
+                    转账金额(CHOP)
+                </div>
+                <div class='panel-body inputBody'>
+                    <input type='text' ng-model='transferObj.amount' class='form-control' placeholder='请输入转账金额' oninput="document.getElementById('value').innerHTML=this.value;" onpropertychange="document.getElementById('value').innerHTML=this.value;">
+                </div>
+            </div>
+            <div class='panel-body inputBody' ng-show="showTranferSetting">
+                <div class='panel panel-default'>
+                    <div class='panel-heading'>
+                        gas
+                    </div>
+                    <div class='panel-body inputBody'>
+                        <input type='text' ng-model='transferObj.gas' class='form-control' placeholder='请输入您期望的gas(默认值：212100)' oninput="document.getElementById('gas').innerHTML=this.value;" onpropertychange="document.getElementById('gas').innerHTML=this.value;">
+                    </div>
+                </div>
+                <div class='panel panel-default'>
+                    <div class='panel-heading'>
+                        gasPrice
+                    </div>
+                    <div class='panel-body inputBody'>
+                     <input type='text' ng-model='transferObj.gasPrice' ng-click="showInputGasPrice(1)" class='form-control' placeholder='请输入您期望的gasPrice(默认值：1)' oninput="document.getElementById('gasPrice').innerHTML=this.value;" onpropertychange="document.getElementById('gasPrice').innerHTML=this.value;">
+                    </div>
+                </div>
+            <br />  
+            </div>
+            <div class='panel panel-default'>
+                <div class='panel-heading'>
+                    转账金额：<span id="value">0</span>CHOP SHARE
+                </div>
+            </div>
+            <div class='panel panel-default' ng-show="showGasPrice">
+                <div class='panel-heading'>
+                    gasPrice：<span id="gasPrice">未输入值</span>wei
+                </div>
+            </div>
+            <div class='panel panel-default' ng-show="showTotal">
+                <div class='panel-heading'>
+                    总计：<p class="label label-info" ng-bind="transferObj.total"></span>
+                </div>
+            </div>
+            <div class='col-md-6 col-sm-6 col-xs-6 text-center'>
+                <button class='btn btn-primary' ng-click="transfer()" >转账</button>
+            </div>
+            <div class='col-md-6 col-sm-6 col-xs-6 text-center'>
+                <button class='btn btn-primary' ng-click="setting()" >高级</button>
+            </div>
+        </form>
+	  	
+	</div>
+    <div class="mortgage" ng-show="showMortgageFlag">
+        <button class="btn btn-warning bitMarginBottom" ng-click="hideMortgage()"><i class="icon-reply"></i>返回</button>
+        <div class="clearfix"></div>
+        <form class='ABIForm' name="ABIForm"  novalidate>
+            <div class='panel panel-default'>
+                <div class='panel-heading'>
+                    我的CHOP账户
+                </div>
+                <div class='panel-body inputBody padding10' >
+                    <p class="label label-info" ng-bind="mortgageObj.from"></span>
+                </div>
+            </div>
+            <div class='panel panel-default' >
+                <div class='panel-heading'>
+                    我的CHOE账户
+                </div>
+                <div class='panel-body inputBody padding10' >
+                    <select  ng-model='myEthAccountAddr' class="form-control" ng-options=' obj.address as obj.address for obj in EthaccountList' ng-change='getEthAccountInfo()'>
+                    </select>
+                </div>
+            </div>
+            <div class='panel panel-default' ng-show='!isAccountPair'>
+                <div class='panel-heading'>
+                    CHOP账户密码
+                </div>
+                <div class='panel-body inputBody'>
+                    <input type='password' ng-model='mortgageObj.password' class='form-control' placeholder='请输入账户密码'>
+                </div>
+            </div>
+            <div class='panel panel-default' ng-show='!isAccountPair'>
+                <div class='panel-heading'>
+                    CHOE账户密码
+                </div>
+                <div class='panel-body inputBody'>
+                    <input type='password' ng-model='mortgageObj.ethpassword' class='form-control' placeholder='请输入账户密码'>
+                </div>
+            </div>
+            <div class='panel panel-default' ng-show='isAccountPair'>
+                <div class='panel-heading'>
+                    CHOP账户对密码
+                </div>
+                <div class='panel-body inputBody'>
+                    <input type='password' ng-model='mortgageObj.password' class='form-control' placeholder='请输入账户密码'>
+                </div>
+            </div>
+            <div class='panel panel-default'>
+                <div class='panel-heading'>
+                    抵押金额
+                </div>
+                <div class='panel-body inputBody'>
+                    <input type='text' ng-model='mortgageObj.amount' class='form-control' placeholder='请输入抵押金额' oninput="document.getElementById('mortgageValue').innerHTML=this.value;" onpropertychange="document.getElementById('mortgageValue').innerHTML=this.value;">
+                </div>
+            </div>
+            <div class='panel-body inputBody' ng-show="showTranferSetting">
+                <div class='panel panel-default'>
+                    <div class='panel-heading'>
+                        gas
+                    </div>
+                    <div class='panel-body inputBody'>
+                        <input type='text' ng-model='mortgageObj.gas' class='form-control' placeholder='请输入您期望的gas(默认值：212100)' oninput="document.getElementById('gas').innerHTML=this.value;" onpropertychange="document.getElementById('gas').innerHTML=this.value;">
+                    </div>
+                </div>
+                <div class='panel panel-default'>
+                    <div class='panel-heading'>
+                        gasPrice
+                    </div>
+                    <div class='panel-body inputBody'>
+                     <input type='text' ng-model='mortgageObj.gasPrice' ng-click="showInputGasPrice(1)" class='form-control' placeholder='请输入您期望的gasPrice(默认值：1)' oninput="document.getElementById('gasPrice').innerHTML=this.value;" onpropertychange="document.getElementById('gasPrice').innerHTML=this.value;">
+                    </div>
+                </div>
+            <br />  
+            </div>
+            <div class='panel panel-default'>
+                <div class='panel-heading'>
+                    抵押金额：<span id="mortgageValue">0</span>CHOP SHARE
+                </div>
+            </div>
+            <div class='col-md-6 col-sm-6 col-xs-6 text-center'>
+                <button class='btn btn-primary' ng-click="mortgage()" >执行</button>
+            </div>
+            <div class='col-md-6 col-sm-6 col-xs-6 text-center'>
+                <button class='btn btn-primary' ng-click="setting()" >高级</button>
+            </div>
+        </form>
+        
+    </div>
+    <div class="redemption" ng-show="showRedemptionFlag">
+        <button class="btn btn-warning bitMarginBottom" ng-click="hideRedemption()"><i class="icon-reply"></i>返回</button>
+        <div class="clearfix"></div>
+        <form class='ABIForm' name="ABIForm"  novalidate>
+            <div class='panel panel-default'>
+                <div class='panel-heading'>
+                    我的CHOP账户
+                </div>
+                <div class='panel-body inputBody padding10' >
+                    <p class="label label-info" ng-bind="redemptionObj.from"></span>
+                    <!-- <input type='text' ng-model='transferObj.from' class='form-control' placeholder=''> -->
+                </div>
+            </div>
+            <div class='panel panel-default'>
+                <div class='panel-heading'>
+                    我的CHOE账户
+                </div>
+                <div class='panel-body inputBody padding10' >
+                    <select  ng-model='myEthAccountAddr' class="form-control" ng-options=' obj.address as obj.address for obj in EthaccountList' ng-change='getEthAccountInfo()'>
+                    </select>
+                </div>
+            </div>
+            <div class='panel panel-default' ng-show='!isAccountPair'>
+                <div class='panel-heading'>
+                    CHOP账户密码
+                </div>
+                <div class='panel-body inputBody'>
+                    <input type='password' ng-model='redemptionObj.password' class='form-control' placeholder='请输入账户密码'>
+                </div>
+            </div>
+            <div class='panel panel-default' ng-show='!isAccountPair'>
+                <div class='panel-heading'>
+                    CHOE账户密码
+                </div>
+                <div class='panel-body inputBody'>
+                    <input type='password' ng-model='redemptionObj.ethpassword' class='form-control' placeholder='请输入账户密码'>
+                </div>
+            </div>
+            <div class='panel panel-default' ng-show='isAccountPair'>
+                <div class='panel-heading'>
+                    CHOP账户对密码
+                </div>
+                <div class='panel-body inputBody'>
+                    <input type='password' ng-model='redemptionObj.password' class='form-control' placeholder='请输入账户密码'>
+                </div>
+            </div>
+            <div class='panel-body inputBody' ng-show="showTranferSetting">
+                <div class='panel panel-default'>
+                    <div class='panel-heading'>
+                        gas
+                    </div>
+                    <div class='panel-body inputBody'>
+                        <input type='text' ng-model='redemptionObj.gas' class='form-control' placeholder='请输入您期望的gas(默认值：212100)' oninput="document.getElementById('gas').innerHTML=this.value;" onpropertychange="document.getElementById('gas').innerHTML=this.value;">
+                    </div>
+                </div>
+                <div class='panel panel-default'>
+                    <div class='panel-heading'>
+                        gasPrice
+                    </div>
+                    <div class='panel-body inputBody'>
+                     <input type='text' ng-model='redemptionObj.gasPrice' ng-click="showInputGasPrice(1)" class='form-control' placeholder='请输入您期望的gasPrice(默认值：1)' oninput="document.getElementById('gasPrice').innerHTML=this.value;" onpropertychange="document.getElementById('gasPrice').innerHTML=this.value;">
+                    </div>
+                </div>
+            <br />  
+            </div>
+            <div class='panel panel-default'>
+                <div class='panel-heading'>
+                    解押金额
+                </div>
+                <div class='panel-body inputBody'>
+                    <input type='text' ng-model='redemptionObj.amount' class='form-control' placeholder='请输入抵押金额' oninput="document.getElementById('redemptionValue').innerHTML=this.value;" onpropertychange="document.getElementById('redemptionValue').innerHTML=this.value;">
+                </div>
+            </div>
+            <div class='panel panel-default'>
+                <div class='panel-heading'>
+                    解押金额：<span id="redemptionValue">0</span>CHOP SHARE
+                </div>
+            </div>
+            <div class='col-md-6 col-sm-6 col-xs-6 text-center'>
+                <button class='btn btn-primary' ng-click="redemption()" >执行</button>
+            </div>
+            <div class='col-md-6 col-sm-6 col-xs-6 text-center'>
+                <button class='btn btn-primary' ng-click="setting()" >高级</button>
+            </div>
+        </form> 
+    </div>
+    <div class="backup" ng-show="showChorusAccountBackupArea">
+        <button class="btn btn-warning bitMarginBottom" ng-click="hideChorusAccountBackupArea()"><i class="icon-reply"></i>返回</button>
+        <div class="clearfix"></div>
+        <h4 class='text-center bitMarginBottom'>CHOP账户备份</h4>
+        <div class="content">
+            <div class='panel-body inputBody padding10' >
+                <p class="label label-info" ng-bind="myAccountInfo.pubKey"></span>
+                <div class="clearfix"></div>
+                <p class="label label-info" ng-bind="myAccountInfo.ethAddress" ng-show="myAccountInfo.ethAddress"></span>
+            </div>
+            <div class="input-group input-group-lg">
+                <span class="input-group-addon">账户密码</span>
+                <input type="password" class="form-control" ng-model="backUp.password" placeholder="请输入账户密码.">
+            </div>
+            <div class="text-center marginTop20">
+                <button class="btn btn-primary" ng-click="backUp(2)">备份</button>
+            </div>
+        </div>
+    </div>	
+		
+</template>

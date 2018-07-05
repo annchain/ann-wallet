@@ -1,0 +1,122 @@
+<template class="task-template">
+	<div class="blockInfo">
+		<h4 class='text-center bitMarginBottom'>区块链浏览器</h4>
+		<div class="row noMargin marginBottom20 blockInfoShow">
+			<div class="col-md-3 col-sm-3 col-xs-3 infoBlock text-center" style="margin-bottom:3px;">
+				<p > <i class="icon icon-table"></i>最优区块</p>
+				<p ><span ng-bind="infoBlock.result.block.header.height"></span></p>
+			</div>
+			<div class="col-md-3 col-sm-3 col-xs-3 infoBlock text-center">
+				<p > <i class="icon icon-dashboard"></i>区块时间</p>
+				<p ><span ng-bind="infoBlock.time"></span></p>
+			</div>
+			<div class="col-md-3 col-sm-3 col-xs-3 infoBlock text-center">
+				<p > <i class="icon icon-bar-chart"></i>验证者</p>
+				<button class="btn btn-warning bitMarginBottom" ng-bind="infoBlock.validators.length" ng-click="showValidatorsArea()"><i class="icon-reply"></i></button>
+			</div>
+			<div class="col-md-3 col-sm-3 col-xs-3 infoBlock text-center">
+				<p > <i class="icon icon-sitemap"></i>交易数</p>
+				<p ><span ng-bind="infoBlock.result.block.data.txs.length"></span></p>
+			</div>
+		</div>
+		<div class='panel panel-primary' ng-show='validatorsArea'>
+			<h5 class='text-center bitMarginBottom'>验证者节点信息</h5>
+			<table class='table table-bordered text-center'>
+				<tr>
+				<th>No.</th><th>address</th><th>pub_key</th><th>voting_power</th><th>accum</th><th>is_ca</th>
+				</tr>
+				<tr ng-repeat="(key,val) in infoBlock.validators">
+					<td ng-bind="key"></td>
+					<td ng-bind='val.address'></td>
+					<td ng-bind='val.pub_key[1]'></td>
+					<td ng-bind='val.voting_power'></td>
+					<td ng-bind='val.accum'></td>
+					<td ng-bind='val.is_ca'></td>
+				</tr>
+			</table>
+		</div>
+		<div class='panel panel-primary' ng-show='infoArea'>
+			<div class="panel-heading">
+	            <form class="form-horizontal formArea ">
+	                <div class="input-group input-group-lg noPadding" style="font-size:16px;">
+	                    <span class="input-group-addon" style="font-size:14px;">区块号/交易HASH</span>
+	                    <div class="form-control" style="padding:6px;">
+	                    	<div class="input-group">
+								<input type="text" class="form-control" ng-model="blockOrTx">
+								<span class="input-group-btn">
+									<button class="btn btn-default" type="button" ng-click="searchTxOrBlock()">
+										查询
+									</button>
+								</span>
+							</div>
+	                    </div>
+	                </div>
+	            </form>
+	        </div>
+	        <div class="panel-body" >
+	            <table class='table table-bordered text-center'>
+	            	<h4 class='bitMarginBottom'>当前区块信息</h4>
+	            	<tr>
+						<td>区块高度</td><td ng-bind='infoBlock.result.block.header.height'></td>
+					</tr>
+					<tr>
+						<td>区块HASH</td><td ng-bind='infoBlock.result.block_meta.hash'></td>
+					</tr>
+					<tr>
+						<td>validators</td><td ng-bind='infoBlock.result.block.header.validators_hash'></td>
+					</tr>
+					<tr>
+						<td>交易数</td><td ng-bind='infoBlock.result.block.data.txs.length'></td>
+					</tr>
+					<tr>
+						<td>交易</td>
+						<td> 
+							<select  ng-model='txHash' class="form-control" ng-options=' txhash for txhash in infoBlock.result.block.data.txs'  ng-change='getTxInfo()'>
+	                    	</select>
+						</td>
+					</tr>
+				</table>
+				<table class='table table-bordered text-center' ng-show="showqueryBlockInfo">
+	            	<h4 class='bitMarginBottom' ng-show="showqueryBlockInfo">查询区块信息</h4>
+	            	<tr>
+						<td>区块高度</td><td ng-bind='blockInfo.result.block.header.height'></td>
+					</tr>
+					<tr>
+						<td>区块HASH</td><td ng-bind='blockInfo.result.block_meta.hash'></td>
+					</tr>
+					<tr>
+						<td>validators</td><td ng-bind='blockInfo.result.block.header.validators_hash'></td>
+					</tr>
+					<tr>
+						<td>交易数</td><td ng-bind='blockInfo.result.block.data.txs.length'></td>
+					</tr>
+					<tr>
+						<td>交易</td>
+						<td> 
+							<select  ng-model='txHash' class="form-control" ng-options=' txhash for txhash in blockInfo.result.block.data.txs'  ng-change='getTxInfo()'>
+	                    	</select>
+						</td>
+					</tr>
+				</table>
+				<div class="panel panel-success" ng-show="showTxInfo">
+					<div class='panel panel-primary'>
+						<div class="panel-heading">
+				            <span class="label label-info" ng-bind="txHash"></span>
+				        </div>
+				    </div>
+				    <h5 class='bitMarginBottom'>交易详情</h5>  
+				     <div class="panel-body" ng-show="showTxInfo">
+				     	<table class='table table-bordered text-center'>
+				     		<tr ng-repeat="(key,val) in txInfoObj">
+								<td ng-bind="key"></td><td ng-bind='val'></td>
+							</tr>
+							<tr ng-repeat="(key,val) in txInfoPayload">
+								<td ng-bind="key"></td><td ng-bind='val'></td>
+							</tr>
+						</table>
+					</div>
+				</div> 
+			</div>
+	    </div>
+	</div>		
+</template>
