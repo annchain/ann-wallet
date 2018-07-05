@@ -1,0 +1,15 @@
+*.swp
+*.swo
+.bak
+*.bak
+.debora
+.revision
+.vagrant
+*.exe
+nohup.out
+.idea/
+logs/
+*.log
+dump*
+*.iml
+.vscode
